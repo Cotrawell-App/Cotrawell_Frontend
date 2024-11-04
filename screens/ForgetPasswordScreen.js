@@ -14,6 +14,7 @@ import { useFonts } from "expo-font";
 import COLORS from "../constants/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ForgetPasswordScreen = ({ navigation }) => {
   const [loaded] = useFonts({
@@ -81,38 +82,52 @@ const ForgetPasswordScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.forgetPasswordContainer}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.contentContainer}>
-          <Text style={styles.headerText}>Forgot Password</Text>
-          <Text style={styles.forgetMessage}>
-            Enter your email and we'll send a verification code to reset your
-            password.
-          </Text>
-          <View>
-            <Input
-              label="Email"
-              placeholder="Enter your email address"
-              onChangeText={(text) => handleChange(text, "email")}
-              error={errors.email}
-              onFocus={() => {
-                handleError(null, "email");
-              }}
-            />
+    <LinearGradient
+      colors={["#E0F7FF", "#89B3BF"]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={styles.background}
+    >
+      <SafeAreaView style={styles.forgetPasswordContainer}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          <View style={styles.contentContainer}>
+            <Text style={styles.headerText}>Forgot Password</Text>
+            <Text style={styles.forgetMessage}>
+              Enter your email and we'll send a verification code to reset your
+              password.
+            </Text>
+            <View>
+              <Input
+                label="Email"
+                placeholder="Enter your email address"
+                onChangeText={(text) => handleChange(text, "email")}
+                error={errors.email}
+                onFocus={() => {
+                  handleError(null, "email");
+                }}
+              />
 
-            <Button title="Request Code" onPress={validate} />
+              <Button title="Request Code" onPress={validate} />
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 export default ForgetPasswordScreen;
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    width: "100%",
+    height: "100vh", // Full height for all platforms
+  },
   forgetPasswordContainer: {
-    backgroundColor: "white",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",

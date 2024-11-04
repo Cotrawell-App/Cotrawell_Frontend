@@ -4,6 +4,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
 import { useFonts } from "expo-font";
@@ -16,7 +17,7 @@ const Input = ({
   error,
   password,
   onFocus = () => {},
-  ...props
+  ...props  
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [hidePassword, setHidePassword] = useState(password);
@@ -40,7 +41,10 @@ const Input = ({
         <TextInput
           secureTextEntry={password && hidePassword}
           placeholder={placeholder}
-          style={styles.textInput}
+          style={[
+            styles.textInput,
+            Platform.OS === "web" && styles.webtextInput,
+          ]}
           autoCorrect={false}
           onFocus={() => {
             onFocus();
@@ -51,14 +55,27 @@ const Input = ({
           }}
           {...props}
         />
-        {password && (
-          <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
-            <Icon
-              name={hidePassword ? "eye-off-outline" : "eye-outline"}
-              style={styles.icon}
-            />
-          </TouchableOpacity>
-        )}
+        {password &&
+          Platform.OS !== "web" && ( // Remove Touchable for web
+            <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
+              <Icon
+                name={hidePassword ? "eye-off-outline" : "eye-outline"}
+                style={styles.icon}
+              />
+            </TouchableOpacity>
+          )}
+        {password &&
+          Platform.OS === "web" && ( // Web-specific password toggle handling
+            <div
+              onClick={() => setHidePassword(!hidePassword)}
+              style={{ cursor: "pointer" }}
+            >
+              <Icon
+                name={hidePassword ? "eye-off-outline" : "eye-outline"}
+                style={styles.icon}
+              />
+            </div>
+          )}
       </View>
       {error && (
         <Text
@@ -96,9 +113,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "PoppinsRegular",
   },
+  webtextInput: {
+    borderWidth: 0,
+    outlineWidth: 0, // Disable the blue outline that shows in web browsers
+  },
   icon: {
     fontSize: 18,
-    color: COLORS.darkGray, // Optionally use a color from your constants
+    color: COLORS.darkGray,
     padding: 5,
   },
 });

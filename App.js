@@ -12,14 +12,13 @@ import ForgetPasswordScreen from "./screens/ForgetPasswordScreen";
 
 const Stack = createStackNavigator();
 
-// Define linking configuration
 const linking = {
   prefixes: ["http://localhost:8081/", "yourapp://"], // Add your own prefix or domain if needed
   config: {
     screens: {
       Login: "login",
       Home: "home",
-      Signup: "signup", // Match this to your URL
+      Signup: "signup",
       Dashboard: "dashboard",
       ForgetPassword: "forget-password",
     },
@@ -37,8 +36,8 @@ export default function App() {
             cardStyle: { backgroundColor: "white" },
           }}
         >
-          <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
           <Stack.Screen
