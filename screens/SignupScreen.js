@@ -7,6 +7,9 @@ import {
   View,
   ActivityIndicator,
   Platform,
+  Dimensions,
+  Image,
+  TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
@@ -16,14 +19,54 @@ import COLORS from "../constants/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import { LinearGradient } from "expo-linear-gradient";
+import * as ImagePicker from "expo-image-picker";
 
 SplashScreen.preventAutoHideAsync();
+const { width } = Dimensions.get("window");
 
 const SignupScreen = ({ navigation }) => {
+  // Load custom fonts
   const [fontsLoaded] = useFonts({
     PoppinsBold: require("../assets/fonts/Poppins-SemiBold.ttf"),
     PoppinsRegular: require("../assets/fonts/Poppins-Regular.ttf"),
   });
+
+  // State for the image and gallery permission
+  const [image, setImage] = useState("");
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+
+  // Request gallery permissions when the component mounts
+  useEffect(() => {
+    const getGalleryPermissions = async () => {
+      const galleryStatus =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasGalleryPermission(galleryStatus.status === "granted");
+    };
+
+    getGalleryPermissions();
+  }, []);
+
+  // Image selection logic
+  const handleImagePickerPress = async () => {
+    if (hasGalleryPermission) {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    } else {
+      alert("No access to gallery.");
+    }
+  };
+
+  if (hasGalleryPermission === false) {
+    return <Text>No access to Internal Storage</Text>;
+  }
 
   const [input, setInput] = useState({
     firstname: "",
@@ -33,11 +76,16 @@ const SignupScreen = ({ navigation }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const imageSource = image
+    ? { uri: image }
+    : {
+        uri: "https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTAxL3JtNjA5LXNvbGlkaWNvbi13LTAwMi1wLnBuZw.png",
+      };
 
   // Hide the splash screen when fonts are loaded
   useEffect(() => {
     if (fontsLoaded) {
-      SplashScreen.hideAsync(); // Hide the splash screen
+      SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
@@ -83,7 +131,7 @@ const SignupScreen = ({ navigation }) => {
   const login = async () => {
     try {
       await AsyncStorage.setItem("user", JSON.stringify(input));
-      navigation.navigate("Home");
+      navigation.navigate("VerifyOTP");
     } catch (error) {
       alert("Error", "Failed to login. Please try again later.");
     }
@@ -113,37 +161,54 @@ const SignupScreen = ({ navigation }) => {
       end={{ x: 0.5, y: 1 }}
       style={styles.background}
     >
-      <SafeAreaView style={styles.signupContainer}>
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <SafeAreaView style={styles.safeAreaViewContainer}>
+        <ScrollView>
           <View style={styles.contentContainer}>
             <Text style={styles.inputText}>Create Profile</Text>
-            <View style={styles.inputContainer}>
-              <Input
-                placeholder="Enter your first name"
-                onChangeText={(text) => handleChange(text, "firstname")}
-                error={errors.firstname}
-                onFocus={() => handleError(null, "firstname")}
-              />
-              <Input
-                placeholder="Enter your last name"
-                onChangeText={(text) => handleChange(text, "lastname")}
-                error={errors.lastname}
-                onFocus={() => handleError(null, "lastname")}
-              />
-              <Input
-                placeholder="Enter your email address"
-                onChangeText={(text) => handleChange(text, "email")}
-                error={errors.email}
-                onFocus={() => handleError(null, "email")}
-              />
-              <Input
-                placeholder="Enter your password"
-                onChangeText={(text) => handleChange(text, "password")}
-                password
-                error={errors.password}
-                onFocus={() => handleError(null, "password")}
-              />
-              <Button title="Create" onPress={validate} />
+            <View style={styles.inputcardContainer}>
+              <View>
+                <Text style={{ alignItems: "center" }}>
+                  This how your details appears in cotrawell
+                </Text>
+                <View style={styles.profileImageContainer}>
+                  <Image source={imageSource} style={styles.image} />
+                  <TouchableOpacity
+                    style={styles.plusSymbol}
+                    onPress={handleImagePickerPress}
+                  >
+                    <Text style={styles.plusSign}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Input
+                  placeholder="Enter your first name"
+                  onChangeText={(text) => handleChange(text, "firstname")}
+                  error={errors.firstname}
+                  onFocus={() => handleError(null, "firstname")}
+                />
+                <Input
+                  placeholder="Enter your last name"
+                  onChangeText={(text) => handleChange(text, "lastname")}
+                  error={errors.lastname}
+                  onFocus={() => handleError(null, "lastname")}
+                />
+                <Input
+                  placeholder="Enter your email address"
+                  onChangeText={(text) => handleChange(text, "email")}
+                  error={errors.email}
+                  onFocus={() => handleError(null, "email")}
+                />
+                <Input
+                  placeholder="Enter your password"
+                  onChangeText={(text) => handleChange(text, "password")}
+                  password
+                  error={errors.password}
+                  onFocus={() => handleError(null, "password")}
+                />
+                <Button title="Create" onPress={validate} />
+              </View>
             </View>
           </View>
         </ScrollView>
@@ -155,39 +220,54 @@ const SignupScreen = ({ navigation }) => {
 export default SignupScreen;
 
 const styles = StyleSheet.create({
-  contentContainer: {
+  background: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    maxWidth: "600px",
-    height: "100vh",
+    alignContent: "center",
+  },
+  safeAreaViewContainer: {
+    marginHorizontal: Platform.OS === "web" && "auto",
+    width: Platform.OS === "web" && "50%",
+  },
+  contentContainer: {
+    backgroundColor: "white",
+    flex: 1,
+    margin: "10%",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  inputcardContainer: {
+    padding: 20,
   },
   inputText: {
     fontSize: 22,
     fontFamily: "PoppinsBold",
-    marginBottom: 20,
-  },
-  inputContainer: {
-    width: "100%",
+    textAlign: "center",
+    backgroundColor: "black",
+    color: "white",
   },
   loaderContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+  image: {
+    alignSelf: "center",
+    width: Platform.OS === "web" ? 200 : 70, // Width on mobile and web
+    height: Platform.OS === "web" ? 200 : 70, // Height on mobile and web
+    marginBottom: 20,
+    borderRadius: Platform.OS === "web" ? "100%" : 35, // Circle on web, half of the size on mobile
+    resizeMode: "cover",
+  },
+  plusSign: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: -12 }, { translateY: -12 }], // Center the + symbol
+    fontSize: 24,
+    color: "white",
+    fontWeight: "bold",
+  },
 });
 
-// Use media queries for more fine-tuned control on web
-const mediaQueries = `
-@media (max-width: 768px) {
-  .contentContainer {
-    padding: 10px; // Adjust padding for smaller screens
-  }
-  .inputText {
-    font-size: 18px; // Smaller font sizes for mobile
-  }
-}
-`;
-
-export { styles, mediaQueries };
+export { styles };

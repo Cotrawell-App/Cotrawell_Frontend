@@ -4,11 +4,13 @@ import { StyleSheet, Platform } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import AppLoading from "expo-app-loading";
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import SignupScreen from "./screens/SignupScreen";
 import DashboardScreen from "./screens/DashboardScreen";
 import ForgetPasswordScreen from "./screens/ForgetPasswordScreen";
+import VerifyOTP from "./screens/VerifyOTP";
 
 const Stack = createStackNavigator();
 
@@ -24,6 +26,17 @@ const linking = {
     },
   },
 };
+
+const [fontsLoaded] = Font.useFonts({
+  CustomFont1: require("./assets/fonts/Poppins-Bold.ttf"),
+  CustomFont2: require("./assets/fonts/Poppins-Medium.ttf"),
+  CustomFont3: require("./assets/fonts/Poppins-Regular.ttf"),
+  CustomFont4: require("./assets/fonts/Poppins-SemiBold.ttf"),
+});
+
+if (!fontsLoaded) {
+  return <AppLoading />;
+}
 
 export default function App() {
   return (
@@ -44,6 +57,7 @@ export default function App() {
             name="ForgetPassword"
             component={ForgetPasswordScreen}
           />
+          <Stack.Screen name="VerifyOTP" component={VerifyOTP} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>
