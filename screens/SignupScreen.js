@@ -24,6 +24,8 @@ import * as ImagePicker from "expo-image-picker";
 SplashScreen.preventAutoHideAsync();
 const { width } = Dimensions.get("window");
 
+const isWeb = Platform.OS === "web";
+
 const SignupScreen = ({ navigation }) => {
   // Load custom fonts
   const [fontsLoaded] = useFonts({
@@ -162,12 +164,18 @@ const SignupScreen = ({ navigation }) => {
       style={styles.background}
     >
       <SafeAreaView style={styles.safeAreaViewContainer}>
-        <ScrollView>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.contentContainer}>
             <Text style={styles.inputText}>Create Profile</Text>
             <View style={styles.inputcardContainer}>
-              <View>
-                <Text style={{ alignItems: "center" }}>
+              <View style={{ alignItems: "center" }}>
+                <Text
+                  style={{
+                    alignItems: "center",
+                    fontFamily: "PoppinsRegular",
+                    marginVertical: 10,
+                  }}
+                >
                   This how your details appears in cotrawell
                 </Text>
                 <View style={styles.profileImageContainer}>
@@ -226,16 +234,24 @@ const styles = StyleSheet.create({
     alignContent: "center",
   },
   safeAreaViewContainer: {
-    marginHorizontal: Platform.OS === "web" && "auto",
-    width: Platform.OS === "web" && "50%",
+    flex: 1, // Take full screen height
+    width: "100%",
+    paddingTop: Platform.OS === "ios" ? 20 : 0, // Padding top for iOS devices
+  },
+  scrollViewContent: {
+    flexGrow: 1, // Allow the content to grow vertically
+    justifyContent: "flex-start", // Ensure it starts at the top
+    alignContent: "center",
   },
   contentContainer: {
     backgroundColor: "white",
-    flex: 1,
-    margin: "10%",
     borderRadius: 10,
+    marginVertical: "auto",
+    marginHorizontal: "auto",
+    maxWidth: isWeb ? 600 : "",
     overflow: "hidden",
   },
+
   inputcardContainer: {
     padding: 20,
   },
@@ -253,17 +269,17 @@ const styles = StyleSheet.create({
   },
   image: {
     alignSelf: "center",
-    width: Platform.OS === "web" ? 200 : 70, // Width on mobile and web
-    height: Platform.OS === "web" ? 200 : 70, // Height on mobile and web
+    width: Platform.OS === "web" ? 100 : 70,
+    height: Platform.OS === "web" ? 100 : 70,
     marginBottom: 20,
-    borderRadius: Platform.OS === "web" ? "100%" : 35, // Circle on web, half of the size on mobile
+    borderRadius: Platform.OS === "web" ? "100%" : 35,
     resizeMode: "cover",
   },
   plusSign: {
     position: "absolute",
     top: "50%",
     left: "50%",
-    transform: [{ translateX: -12 }, { translateY: -12 }], // Center the + symbol
+    transform: [{ translateX: -12 }, { translateY: -12 }],
     fontSize: 24,
     color: "white",
     fontWeight: "bold",

@@ -1,4 +1,4 @@
-import { TouchableOpacity, StyleSheet, Text } from "react-native";
+import { TouchableOpacity, StyleSheet, Text, Platform } from "react-native";
 import React from "react";
 import COLORS from "../constants/colors";
 import { useFonts } from "expo-font";
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 15,
     marginTop: 10,
+    cursor: Platform.OS === "web" ? "pointer" : "auto",
   },
   buttonTitle: {
     fontSize: 14,

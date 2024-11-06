@@ -4,7 +4,6 @@ import { StyleSheet, Platform } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import AppLoading from "expo-app-loading";
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import SignupScreen from "./screens/SignupScreen";
@@ -23,20 +22,10 @@ const linking = {
       Signup: "signup",
       Dashboard: "dashboard",
       ForgetPassword: "forget-password",
+      VerifyOTP: "VerifyOTP",
     },
   },
 };
-
-const [fontsLoaded] = Font.useFonts({
-  CustomFont1: require("./assets/fonts/Poppins-Bold.ttf"),
-  CustomFont2: require("./assets/fonts/Poppins-Medium.ttf"),
-  CustomFont3: require("./assets/fonts/Poppins-Regular.ttf"),
-  CustomFont4: require("./assets/fonts/Poppins-SemiBold.ttf"),
-});
-
-if (!fontsLoaded) {
-  return <AppLoading />;
-}
 
 export default function App() {
   return (
