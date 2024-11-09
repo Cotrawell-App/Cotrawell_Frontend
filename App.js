@@ -1,3 +1,13 @@
+import "react-native-get-random-values";
+import "react-native-url-polyfill/auto";
+import { ReadableStream } from "web-streams-polyfill";
+
+if (typeof global.ReadableStream === "undefined") {
+  global.ReadableStream = ReadableStream;
+}
+import { Buffer } from "buffer";
+global.Buffer = Buffer;
+
 import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Platform } from "react-native";

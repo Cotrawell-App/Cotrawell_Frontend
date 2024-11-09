@@ -19,7 +19,9 @@ import COLORS from "../constants/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import { LinearGradient } from "expo-linear-gradient";
-import * as ImagePicker from "expo-image-picker";
+// import * as ImagePicker from "expo-image-picker";
+// import { signIn, signUp } from "../AuthService";
+import { signUp } from "../services/CognitoService";
 
 SplashScreen.preventAutoHideAsync();
 const { width } = Dimensions.get("window");
@@ -34,41 +36,41 @@ const SignupScreen = ({ navigation }) => {
   });
 
   // State for the image and gallery permission
-  const [image, setImage] = useState("");
-  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+  // const [image, setImage] = useState("");
+  // const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
 
-  // Request gallery permissions when the component mounts
-  useEffect(() => {
-    const getGalleryPermissions = async () => {
-      const galleryStatus =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      setHasGalleryPermission(galleryStatus.status === "granted");
-    };
+  // // Request gallery permissions when the component mounts
+  // useEffect(() => {
+  //   const getGalleryPermissions = async () => {
+  //     const galleryStatus =
+  //       await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //     setHasGalleryPermission(galleryStatus.status === "granted");
+  //   };
 
-    getGalleryPermissions();
-  }, []);
+  //   getGalleryPermissions();
+  // }, []);
 
   // Image selection logic
-  const handleImagePickerPress = async () => {
-    if (hasGalleryPermission) {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
+  // const handleImagePickerPress = async () => {
+  //   if (hasGalleryPermission) {
+  //     let result = await ImagePicker.launchImageLibraryAsync({
+  //       mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //       allowsEditing: true,
+  //       aspect: [1, 1],
+  //       quality: 1,
+  //     });
 
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-      }
-    } else {
-      alert("No access to gallery.");
-    }
-  };
+  //     if (!result.canceled) {
+  //       setImage(result.assets[0].uri);
+  //     }
+  //   } else {
+  //     alert("No access to gallery.");
+  //   }
+  // };
 
-  if (hasGalleryPermission === false) {
-    return <Text>No access to Internal Storage</Text>;
-  }
+  // if (hasGalleryPermission === false) {
+  //   return <Text>No access to Internal Storage</Text>;
+  // }
 
   const [input, setInput] = useState({
     firstname: "",
@@ -78,11 +80,12 @@ const SignupScreen = ({ navigation }) => {
   });
 
   const [errors, setErrors] = useState({});
-  const imageSource = image
-    ? { uri: image }
-    : {
-        uri: "https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTAxL3JtNjA5LXNvbGlkaWNvbi13LTAwMi1wLnBuZw.png",
-      };
+  const [message, setMessage] = useState("");
+  // const imageSource = image
+  //   ? { uri: image }
+  //   : {
+  //       uri: "https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTAxL3JtNjA5LXNvbGlkaWNvbi13LTAwMi1wLnBuZw.png",
+  //     };
 
   // Hide the splash screen when fonts are loaded
   useEffect(() => {
@@ -96,16 +99,16 @@ const SignupScreen = ({ navigation }) => {
     let valid = true;
 
     // Validate first name
-    if (!input.firstname) {
-      handleError("Please enter your first name", "firstname");
-      valid = false;
-    }
+    // if (!input.firstname) {
+    //   handleError("Please enter your first name", "firstname");
+    //   valid = false;
+    // }
 
-    // Validate last name
-    if (!input.lastname) {
-      handleError("Please enter your last name", "lastname");
-      valid = false;
-    }
+    // // Validate last name
+    // if (!input.lastname) {
+    //   handleError("Please enter your last name", "lastname");
+    //   valid = false;
+    // }
 
     // Validate email
     if (!input.email) {
@@ -126,16 +129,19 @@ const SignupScreen = ({ navigation }) => {
     }
 
     if (valid) {
-      login();
+      handleSignUp();
     }
   };
 
-  const login = async () => {
+  const handleSignUp = async () => {
     try {
+      const result = await signUp(input.email, input.password);
+      setMessage(`Sign-up successful: ${result.user.getUsername()}`);
       await AsyncStorage.setItem("user", JSON.stringify(input));
       navigation.navigate("VerifyOTP");
     } catch (error) {
-      alert("Error", "Failed to login. Please try again later.");
+      setMessage(`Error: ${error.message}`);
+      alert("Error", "Failed to sign up. Please try again.");
     }
   };
 
@@ -178,7 +184,7 @@ const SignupScreen = ({ navigation }) => {
                 >
                   This how your details appears in cotrawell
                 </Text>
-                <View style={styles.profileImageContainer}>
+                {/* <View style={styles.profileImageContainer}>
                   <Image source={imageSource} style={styles.image} />
                   <TouchableOpacity
                     style={styles.plusSymbol}
@@ -186,7 +192,7 @@ const SignupScreen = ({ navigation }) => {
                   >
                     <Text style={styles.plusSign}>+</Text>
                   </TouchableOpacity>
-                </View>
+                </View> */}
               </View>
 
               <View style={styles.inputContainer}>
