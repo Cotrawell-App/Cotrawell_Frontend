@@ -1,11 +1,10 @@
 import { TouchableOpacity, StyleSheet, Text, Platform } from "react-native";
 import React from "react";
-import COLORS from "../constants/colors";
 import { useFonts } from "expo-font";
 
 const Button = ({ title, onPress = () => {} }) => {
   const [loaded] = useFonts({
-    PoppinsBold: require("../assets/fonts/Poppins-SemiBold.ttf"),
+    PoppinsBold: require("../assets/fonts/Poppins-Bold.ttf"),
     PoppinsRegular: require("../assets/fonts/Poppins-Regular.ttf"),
   });
 

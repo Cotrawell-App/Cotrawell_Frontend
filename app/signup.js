@@ -2,15 +2,11 @@ import {
   Keyboard,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   View,
   ActivityIndicator,
-  Platform,
-  Dimensions,
-  Image,
-  TouchableOpacity,
 } from "react-native";
+import { signupStyles } from "../styles/signupStyle";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import { useFonts } from "expo-font";
@@ -21,15 +17,11 @@ import Button from "../components/Button";
 import { LinearGradient } from "expo-linear-gradient";
 // import * as ImagePicker from "expo-image-picker";
 // import { signIn, signUp } from "../AuthService";
-import { signUp } from "../services/CognitoService";
+// import { signUp } from "../services/CognitoService";
 
 SplashScreen.preventAutoHideAsync();
-const { width } = Dimensions.get("window");
 
-const isWeb = Platform.OS === "web";
-
-const SignupScreen = ({ navigation }) => {
-  // Load custom fonts
+const SignupScreen = () => {
   const [fontsLoaded] = useFonts({
     PoppinsBold: require("../assets/fonts/Poppins-SemiBold.ttf"),
     PoppinsRegular: require("../assets/fonts/Poppins-Regular.ttf"),
@@ -87,7 +79,6 @@ const SignupScreen = ({ navigation }) => {
   //       uri: "https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTAxL3JtNjA5LXNvbGlkaWNvbi13LTAwMi1wLnBuZw.png",
   //     };
 
-  // Hide the splash screen when fonts are loaded
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
@@ -95,7 +86,7 @@ const SignupScreen = ({ navigation }) => {
   }, [fontsLoaded]);
 
   const validate = () => {
-    Keyboard.dismiss(); // Dismiss keyboard on validation
+    Keyboard.dismiss();
     let valid = true;
 
     // Validate first name
@@ -135,13 +126,12 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignUp = async () => {
     try {
-      const result = await signUp(input.email, input.password);
+      // const result = await signUp(input.email, input.password);
       setMessage(`Sign-up successful: ${result.user.getUsername()}`);
       await AsyncStorage.setItem("user", JSON.stringify(input));
-      navigation.navigate("VerifyOTP");
     } catch (error) {
       setMessage(`Error: ${error.message}`);
-      alert("Error", "Failed to sign up. Please try again.");
+      console.log(message, "message");
     }
   };
 
@@ -153,10 +143,9 @@ const SignupScreen = ({ navigation }) => {
     setErrors((prevState) => ({ ...prevState, [inputField]: errorMessage }));
   };
 
-  // Show the splash/loading indicator until the fonts are fully loaded
   if (!fontsLoaded) {
     return (
-      <SafeAreaView style={styles.loaderContainer}>
+      <SafeAreaView style={signupStyles.loaderContainer}>
         <ActivityIndicator size="large" color={COLORS.primary} />
       </SafeAreaView>
     );
@@ -167,13 +156,13 @@ const SignupScreen = ({ navigation }) => {
       colors={["#E0F7FF", "#89B3BF"]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
-      style={styles.background}
+      style={signupStyles.background}
     >
-      <SafeAreaView style={styles.safeAreaViewContainer}>
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <View style={styles.contentContainer}>
-            <Text style={styles.inputText}>Create Profile</Text>
-            <View style={styles.inputcardContainer}>
+      <SafeAreaView style={signupStyles.safeAreaViewContainer}>
+        <ScrollView contentContainerStyle={signupStyles.scrollViewContent}>
+          <View style={signupStyles.contentContainer}>
+            <Text style={signupStyles.inputText}>Create Profile</Text>
+            <View style={signupStyles.inputcardContainer}>
               <View style={{ alignItems: "center" }}>
                 <Text
                   style={{
@@ -185,17 +174,17 @@ const SignupScreen = ({ navigation }) => {
                   This how your details appears in cotrawell
                 </Text>
                 {/* <View style={styles.profileImageContainer}>
-                  <Image source={imageSource} style={styles.image} />
-                  <TouchableOpacity
-                    style={styles.plusSymbol}
-                    onPress={handleImagePickerPress}
-                  >
-                    <Text style={styles.plusSign}>+</Text>
-                  </TouchableOpacity>
-                </View> */}
+                    <Image source={imageSource} style={styles.image} />
+                    <TouchableOpacity
+                      style={styles.plusSymbol}
+                      onPress={handleImagePickerPress}
+                    >
+                      <Text style={styles.plusSign}>+</Text>
+                    </TouchableOpacity>
+                  </View> */}
               </View>
 
-              <View style={styles.inputContainer}>
+              <View style={signupStyles.inputContainer}>
                 <Input
                   placeholder="Enter your first name"
                   onChangeText={(text) => handleChange(text, "firstname")}
@@ -232,64 +221,3 @@ const SignupScreen = ({ navigation }) => {
 };
 
 export default SignupScreen;
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    justifyContent: "center",
-    alignContent: "center",
-  },
-  safeAreaViewContainer: {
-    flex: 1, // Take full screen height
-    width: "100%",
-    paddingTop: Platform.OS === "ios" ? 20 : 0, // Padding top for iOS devices
-  },
-  scrollViewContent: {
-    flexGrow: 1, // Allow the content to grow vertically
-    justifyContent: "flex-start", // Ensure it starts at the top
-    alignContent: "center",
-  },
-  contentContainer: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    marginVertical: "auto",
-    marginHorizontal: "auto",
-    maxWidth: isWeb ? 600 : "",
-    overflow: "hidden",
-  },
-
-  inputcardContainer: {
-    padding: 20,
-  },
-  inputText: {
-    fontSize: 22,
-    fontFamily: "PoppinsBold",
-    textAlign: "center",
-    backgroundColor: "black",
-    color: "white",
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  image: {
-    alignSelf: "center",
-    width: Platform.OS === "web" ? 100 : 70,
-    height: Platform.OS === "web" ? 100 : 70,
-    marginBottom: 20,
-    borderRadius: Platform.OS === "web" ? "100%" : 35,
-    resizeMode: "cover",
-  },
-  plusSign: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: [{ translateX: -12 }, { translateY: -12 }],
-    fontSize: 24,
-    color: "white",
-    fontWeight: "bold",
-  },
-});
-
-export { styles };
